@@ -6444,19 +6444,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 // vue2 dropzone
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      editMode: false,
       products: [],
       images: [],
       form: new Form({
         id: '',
         title: '',
         details: '',
-        status: 1,
-        url: ''
+        status: '',
+        url: []
       }),
       dropzoneOptions: {
         url: 'https://httpbin.org/post',
@@ -6479,8 +6486,11 @@ __webpack_require__.r(__webpack_exports__);
     addProduct: function addProduct() {
       this.form.post('api/products').then(function (data) {
         console.log(data);
+      })["catch"](function (errors) {
+        console.log(error);
       });
     },
+    updateProduct: function updateProduct() {},
     uploadImage: function uploadImage(file) {
       var image = file.dataURL;
       this.images.push(image);
@@ -6494,11 +6504,31 @@ __webpack_require__.r(__webpack_exports__);
       var image = file.dataURL;
       this.images.pop(image);
       console.log(image);
+    },
+    showModal: function showModal() {
+      this.editMode = false;
+      this.resetModal();
+    },
+    editModal: function editModal(product) {
+      this.editMode = true;
+      this.resetModal();
+      this.form.fill(product);
+    },
+    resetModal: function resetModal() {
+      this.form.reset();
+      this.form.clear();
+      $('#ProductCRUD').modal('show');
     }
   },
   watch: {
     images: function images(val) {
-      this.form.fill(this.images);
+      //console.log(val);
+      // this.form.fill(this.url);
+      var self = this;
+      this.form.url = [];
+      $.each(val, function (index, value) {
+        self.form.url.push(value);
+      });
     }
   }
 });
@@ -44526,7 +44556,67 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _vm._m(0),
+    _c("div", { staticClass: "row mt-5" }, [
+      _c("div", { staticClass: "col-md-12" }, [
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _c("h3", { staticClass: "card-title" }, [_vm._v("Product List")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-tools" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-success",
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.showModal()
+                    }
+                  }
+                },
+                [_vm._v("Add New "), _c("i", { staticClass: "fas fa-plus" })]
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body table-responsive p-0" }, [
+            _c("table", { staticClass: "table table-hover" }, [
+              _c("tbody", [
+                _vm._m(0),
+                _vm._v(" "),
+                _c("tr", [
+                  _c("td", [_vm._v("dsds")]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v("dsds")]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v("dsds")]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-success mr-2",
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            return _vm.editModal(_vm.product)
+                          }
+                        }
+                      },
+                      [_c("i", { staticClass: "fa fa-edit" })]
+                    ),
+                    _vm._v(" "),
+                    _vm._m(1)
+                  ])
+                ])
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-footer" })
+        ])
+      ])
+    ]),
     _vm._v(" "),
     _c(
       "div",
@@ -44546,7 +44636,7 @@ var render = function() {
           { staticClass: "modal-dialog", attrs: { role: "document" } },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(1),
+              _vm._m(2),
               _vm._v(" "),
               _c(
                 "form",
@@ -44554,7 +44644,7 @@ var render = function() {
                   on: {
                     submit: function($event) {
                       $event.preventDefault()
-                      return _vm.addProduct()
+                      _vm.editMode ? _vm.updateProduct() : _vm.addProduct()
                     },
                     keydown: function($event) {
                       return _vm.form.onKeydown($event)
@@ -44632,7 +44722,7 @@ var render = function() {
                           class: {
                             "is-invalid": _vm.form.errors.has("details")
                           },
-                          attrs: { type: "text", name: "details" },
+                          attrs: { typ: "", e: "text", name: "details" },
                           domProps: { value: _vm.form.details },
                           on: {
                             input: function($event) {
@@ -44663,7 +44753,11 @@ var render = function() {
                           },
                           [_vm._v("Status:")]
                         ),
-                        _vm._v(" "),
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(_vm.form.status) +
+                            "\n                                "
+                        ),
                         _c(
                           "select",
                           {
@@ -44701,8 +44795,18 @@ var render = function() {
                             }
                           },
                           [
+                            _c(
+                              "option",
+                              { attrs: { value: " ", selected: "" } },
+                              [_vm._v("Choose option")]
+                            ),
+                            _vm._v(" "),
                             _c("option", { attrs: { value: "1" } }, [
-                              _vm._v("sdfsd")
+                              _vm._v("Active")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "0" } }, [
+                              _vm._v("InActive")
                             ])
                           ]
                         ),
@@ -44737,6 +44841,10 @@ var render = function() {
                             "vdropzone-success": _vm.uploadImage,
                             "vdropzone-removed-file": _vm.removeImage
                           }
+                        }),
+                        _vm._v(" "),
+                        _c("has-error", {
+                          attrs: { form: _vm.form, field: "url" }
                         })
                       ],
                       1
@@ -44776,56 +44884,22 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row mt-5" }, [
-      _c("div", { staticClass: "col-md-12" }, [
-        _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-header" }, [
-            _c("h3", { staticClass: "card-title" }, [_vm._v("Product List")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-tools" }, [
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-success",
-                  attrs: {
-                    "data-toggle": "modal",
-                    "data-target": "#ProductCRUD"
-                  }
-                },
-                [_vm._v("Add New "), _c("i", { staticClass: "fas fa-plus" })]
-              )
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card-body table-responsive p-0" }, [
-            _c("table", { staticClass: "table table-hover" }, [
-              _c("tbody", [
-                _c("tr", [
-                  _c("th", [_vm._v("Title")]),
-                  _vm._v(" "),
-                  _c("th", [_vm._v("Imaage")]),
-                  _vm._v(" "),
-                  _c("th", [_vm._v("Registered At")]),
-                  _vm._v(" "),
-                  _c("th", [_vm._v("Modify")])
-                ]),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", [_vm._v("dsds")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("dsds")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("dsds")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v("dsds")])
-                ])
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card-footer" })
-        ])
-      ])
+    return _c("tr", [
+      _c("th", [_vm._v("Title")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Imaage")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Registered At")]),
+      _vm._v(" "),
+      _c("th", { attrs: { width: "15%" } }, [_vm._v("Modify")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("button", { staticClass: "btn btn-danger" }, [
+      _c("i", { staticClass: "fa fa-trash" })
     ])
   },
   function() {

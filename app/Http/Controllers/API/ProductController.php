@@ -4,9 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Traits\ProductTraits;
 class ProductController extends Controller
 {
+    use ProductTraits;
     /**
      * Display a listing of the resource.
      *
@@ -35,6 +36,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $this->data_validate($request);
         return $request;
     }
 
